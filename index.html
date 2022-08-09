@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <title>lutiyGame</title>
+  </head>
+  <body>
+    <div class="wrapper">
+      <video class="bgvideo" src="./assets/bg.mp4" muted autoplay loop></video>
+      <div class="hello"><div class="buttonPlay">PLAY</div></div>
+      <div class="interface">
+        <div id="score">
+          Score:
+          <div id="scoreNum">0</div>
+        </div>
+        <div id="HP">
+          HP:
+          <div id="HPnum">0</div>
+        </div>
+        <div class="weapon">
+          <div id="bullet1">
+            <img src="./assets/bullet1.png" alt="" />
+            <div class="cd1"></div>
+          </div>
+          <div id="bullet2">
+            <img src="./assets/bullet2.png" alt="" />
+            <div class="cd2"></div>
+          </div>
+          <div id="bullet3">
+            <img src="./assets/bullet2.png" alt="" />
+            <div class="cd3"></div>
+          </div>
+        </div>
+      </div>
+      <canvas id="canvas" width="1200px" height="800px"></canvas>
+    </div>
+    <script type="module" src="./main.js"></script>
+    <script type="module" src="./index.js"></script>
+  </body>
+</html>

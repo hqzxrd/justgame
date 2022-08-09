@@ -1,0 +1,155 @@
+body {
+  background: #000;
+}
+
+.wrapper {
+  width: 900px;
+  font-family: "Courier New", Courier, monospace;
+}
+
+canvas {
+  position: absolute;
+  left: 350px;
+  margin-top: 50px;
+  background: #fff;
+  border: 1px dashed darkblue;
+  z-index: -1;
+}
+
+.interface {
+  position: relative;
+  left: 350px;
+  user-select: none;
+}
+
+#score {
+  display: inline-block;
+  position: absolute;
+  top: 100px;
+  left: 50px;
+  font-size: 26px;
+}
+
+#scoreNum {
+  position: absolute;
+  left: 100px;
+  top: 2px;
+}
+
+#HP {
+  display: inline-block;
+  position: absolute;
+  top: 150px;
+  left: 50px;
+  font-size: 26px;
+}
+
+#HPnum {
+  position: absolute;
+  left: 100px;
+  top: 2px;
+}
+
+.weapon {
+  position: relative;
+  left: 460px;
+}
+
+#bullet1 {
+  position: absolute;
+  top: 700px;
+  border: 2px solid violet;
+  transform: scale(1.2);
+  border-radius: 10px;
+  height: 40px;
+}
+
+#bullet1 img {
+  width: 40px;
+  border-radius: 8px;
+}
+
+.cd1 {
+  position: relative;
+  color: aquamarine;
+  top: -33px;
+  left: 6px;
+  display: none;
+}
+
+#bullet2 {
+  position: absolute;
+  top: 700px;
+  left: 60px;
+  height: 40px;
+  border-radius: 10px;
+}
+
+#bullet2 img {
+  width: 40px;
+  border-radius: 8px;
+}
+
+.cd2 {
+  position: relative;
+  color: aquamarine;
+  top: -33px;
+  left: 6px;
+  display: none;
+}
+
+#bullet3 {
+  position: absolute;
+  top: 700px;
+  left: 150px;
+  height: 40px;
+  border-radius: 10px;
+}
+
+#bullet3 img {
+  width: 40px;
+  border-radius: 8px;
+}
+
+.cd3 {
+  position: relative;
+  color: aquamarine;
+  top: -33px;
+  left: 1px;
+  display: none;
+}
+
+.hello {
+  position: absolute;
+  top: 50px;
+  left: 360px;
+  width: 900px;
+  height: 810px;
+  z-index: 1;
+  /* background: #000; */
+}
+
+.buttonPlay {
+  position: absolute;
+  color: black;
+  /* color: white; */
+  font-size: 50px;
+  top: 400px;
+  left: 480px;
+}
+
+.buttonPlay:hover {
+  transition: 0.5s;
+  transform: scale(1.1);
+  cursor: pointer;
+  background: #000;
+  color: white;
+}
+
+.bgvideo {
+  position: absolute;
+  transform: scale(0.8);
+  top: -70px;
+  left: 25px;
+  z-index: 1;
+}
