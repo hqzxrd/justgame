@@ -7,9 +7,12 @@ cv.height = 800;
 const ct = cv.getContext("2d");
 let GG = new Image();
 GG.src = `assets/GG1.png`;
-let enGG = new Image();
-enGG.src = `assets/enemy.png`;
+let tier1enemy = new Image();
+tier1enemy.src = `assets/tier1enemy.png`;
+let tier2enemy = new Image();
+tier2enemy.src = `assets/tier2enemy.png`;
 let orb1 = new Image();
+
 orb1.src = `assets/orb1.png`;
 let bulletArr = [];
 let enemiesArr = [];
@@ -38,7 +41,7 @@ class Player {
     this.mouseX = 0;
     this.mouseY = 0;
     this.HP = 3;
-    this.dmg = 1;
+    this.ATK = 1;
   }
   drawPlayer() {
     ct.drawImage(
@@ -67,12 +70,12 @@ class Player {
   refreshWeaponCD() {
     for (let i = 0; i < this.weapon.length; i++) {
       this.weapon[i].refreshCD();
-      let cd1 = document.querySelector(`.cd${i + 1}`);
+      var cd = document.querySelector(`.cd${i + 1}`);
       if (this.weapon[i].curCD == 0) {
-        cd1.style.display = `none`;
+        cd.style.display = `none`;
       } else {
-        cd1.innerHTML = Math.ceil(this.weapon[i].curCD / 100) / 10;
-        cd1.style.display = `block`;
+        cd.innerHTML = Math.ceil(this.weapon[i].curCD / 100) / 10;
+        cd.style.display = `block`;
       }
     }
   }
@@ -90,12 +93,13 @@ class enemy {
     this.vel = new Vector2(0, 0);
     this.HP = 2;
     this.dmg = 1;
+    this.getScore = 1;
   }
   drawEnemy() {
     ct.drawImage(
       this.unit,
-      this.pos.x - this.shiftX,
-      this.pos.y - this.shiftY,
+      this.pos.x - this.shiftX + 30,
+      this.pos.y - this.shiftY + 25,
       this.W,
       this.H
     );
@@ -154,7 +158,7 @@ class defaultBullet {
     this.bulletSprite = orb1;
     this.color = `black`;
     this.size = 5;
-    this.abobus = 100;
+    this.dmg = 0;
   }
 
   drawBullet() {
@@ -185,24 +189,26 @@ class defaultBullet {
 }
 
 class bullet extends defaultBullet {
-  constructor(x, y, angle) {
+  constructor(x, y, angle, dmg) {
     super(x, y, angle);
     this.bulletRange = 600;
     this.speed = 10;
     this.vel = new Vector2(this.speed, 0).rotateTo(this.angle);
     this.bulletSprite = orb1;
     this.size = 50;
+    this.dmg = this.dmg + unitPlayer.ATK;
   }
 }
 
 class shotgunBullet extends defaultBullet {
-  constructor(x, y, angle) {
+  constructor(x, y, angle, dmg) {
     super(x, y, angle);
     this.bulletRange = 300;
     this.speed = 15;
     this.vel = new Vector2(this.speed, 0).rotateTo(this.angle);
     this.bulletSprite = orb1;
     this.size = 25;
+    this.dmg = this.dmg + unitPlayer.ATK;
   }
 }
 
@@ -214,6 +220,7 @@ class circleShotBullet extends defaultBullet {
     this.vel = new Vector2(this.speed, 0).rotateTo(this.angle);
     this.bulletSprite = orb1;
     this.size = 50;
+    this.dmg = this.dmg + unitPlayer.ATK;
   }
 }
 
@@ -253,10 +260,11 @@ window.addEventListener(`keyup`, function (e) {
 let bullet1Icon = document.querySelector(`#bullet1`);
 let bullet2Icon = document.querySelector(`#bullet2`);
 let bullet3Icon = document.querySelector(`#bullet3`);
-
+let curSlot = 0;
 window.addEventListener(`keydown`, function (e) {
   if (e.code == `Digit1`) {
     unitPlayer.curSlot = 0;
+    curSlot = unitPlayer.curSlot;
     bullet1Icon.style.border = `2px solid violet`;
     bullet1Icon.style.transform = `scale(1.2)`;
     bullet2Icon.style.border = `2px solid black`;
@@ -264,14 +272,20 @@ window.addEventListener(`keydown`, function (e) {
   }
   if (e.code == `Digit2`) {
     unitPlayer.curSlot = 1;
+    curSlot = unitPlayer.curSlot;
     bullet2Icon.style.border = `2px solid violet`;
     bullet2Icon.style.transform = `scale(1.2)`;
     bullet1Icon.style.border = `2px solid black`;
     bullet1Icon.style.transform = `scale(1)`;
   }
   if (e.code == `Space`) {
-    unitPlayer.shooting = true;
-    unitPlayer.curSlot = 2;
+    if (unitPlayer.weapon[2].curCD > 0) {
+      unitPlayer.curSlot = curSlot;
+      unitPlayer.shooting = false;
+    } else {
+      unitPlayer.shooting = true;
+      unitPlayer.curSlot = 2;
+    }
     bullet3Icon.style.border = `2px solid violet`;
     bullet3Icon.style.transform = `scale(1.2)`;
   }
@@ -279,8 +293,13 @@ window.addEventListener(`keydown`, function (e) {
 
 window.addEventListener(`keyup`, function (e) {
   if (e.code == `Space`) {
-    unitPlayer.shooting = false;
-    unitPlayer.curSlot = 2;
+    if (unitPlayer.weapon[2].curCD > 1) {
+      unitPlayer.shooting = true;
+      unitPlayer.curSlot = curSlot;
+    } else {
+      unitPlayer.curSlot = 2;
+      unitPlayer.shooting = false;
+    }
     bullet3Icon.style.border = `2px solid black`;
     bullet3Icon.style.transform = `scale(1)`;
   }
@@ -305,10 +324,8 @@ function shot(unit, targetPos, weaponType) {
     case 1:
       bulletType = weaponType;
       angleAim = targetPos.sub(unit.pos).angle;
-      angleAim += (Math.random() * 10 - 5) * DEG2RAD;
-      console.log(angleAim);
+      angleAim += (Math.random() * 14 - 7) * DEG2RAD;
       bulletArr.push(new bullet(unit.pos.x, unit.pos.y, angleAim));
-
       break;
     case 2:
       bulletType = weaponType;
@@ -337,7 +354,6 @@ function shot(unit, targetPos, weaponType) {
           new circleShotBullet(unit.pos.x, unit.pos.y, targetPos.angle - i)
         );
       }
-
       break;
     default:
       throw `Wrong weapon type`;
@@ -407,29 +423,55 @@ function drawBackground() {
   }
 }
 
-let lastSpawnTime = 0;
-let interval = 1000;
-function spawnTimeEnemies() {
+let lastSpawnTimeT1 = 0;
+let intervalT1 = 1500;
+function spawnTimeEnemiesT1() {
   let curTime = new Date();
 
-  if (curTime - lastSpawnTime >= interval) {
-    if (interval > 300) {
-      interval -= Math.ceil(0.01 * interval);
+  if (curTime - lastSpawnTimeT1 >= intervalT1) {
+    if (intervalT1 > 400) {
+      intervalT1 -= Math.ceil(0.01 * intervalT1);
     }
-    lastSpawnTime = curTime;
-    spawnEnemies();
+    lastSpawnTimeT1 = curTime;
+    spawnEnemiesT1();
+  }
+}
+let lastSpawnTimeT2 = 0;
+let intervalT2 = 15000;
+function spawnTimeEnemiesT2() {
+  let curTime = new Date();
+
+  if (curTime - lastSpawnTimeT2 >= intervalT2 && enemiesArr.length > 7) {
+    if (intervalT2 > 12000) {
+      intervalT2 -= Math.ceil(0.01 * intervalT2);
+    }
+    lastSpawnTimeT2 = curTime;
+    spawnEnemiesT2();
   }
 }
 
-function spawnEnemies() {
+function spawnEnemiesT1() {
   let vecCenter = new Vector2(cv.width / 2, cv.height / 2);
   let vecEnemy = new Vector2(cv.width / 2 + 100, 0);
   vecEnemy.rotateTo(Math.random() * 360 * DEG2RAD);
   vecEnemy.add(vecCenter);
-  let newEnemy = new enemy(enGG, vecEnemy.x, vecEnemy.y, 1, 100, 100);
+  let newEnemy = new enemy(tier1enemy, vecEnemy.x, vecEnemy.y, 0.8, 100, 100);
   newEnemy.vel.set(unitPlayer.pos);
   newEnemy.vel.sub(newEnemy.pos).normalize().mult(newEnemy.speed);
   enemiesArr.push(newEnemy);
+}
+
+function spawnEnemiesT2() {
+  let vecCenter = new Vector2(cv.width / 2, cv.height / 2);
+  let vecEnemy = new Vector2(cv.width / 2 + 100, 0);
+  vecEnemy.rotateTo(Math.random() * 360 * DEG2RAD);
+  vecEnemy.add(vecCenter);
+  let newEnemy2 = new enemy(tier2enemy, vecEnemy.x, vecEnemy.y, 5, 100, 100);
+  newEnemy2.HP = 1;
+  newEnemy2.getScore = 5;
+  newEnemy2.vel.set(unitPlayer.pos);
+  newEnemy2.vel.sub(newEnemy2.pos).normalize().mult(newEnemy2.speed);
+  enemiesArr.push(newEnemy2);
 }
 
 function enemyMove() {
@@ -453,13 +495,16 @@ function killEnemy() {
     bulletCount = 0;
     while (bulletCount < bulletArr.length) {
       vec.set(enemiesArr[enemyCount].pos).sub(bulletArr[bulletCount].pos);
-      if (vec.mag < 40) {
-        enemiesArr.splice(enemyCount, 1);
+      if (vec.mag < 50) {
+        enemiesArr[enemyCount].HP -= bulletArr[bulletCount].dmg;
         bulletArr.splice(bulletCount, 1);
-        score++;
-        document.querySelector(`#scoreNum`).innerHTML = score;
-        f = true;
-        break;
+        if (enemiesArr[enemyCount].HP <= 0) {
+          score += enemiesArr[enemyCount].getScore;
+          enemiesArr.splice(enemyCount, 1);
+          document.querySelector(`#scoreNum`).innerHTML = score;
+          f = true;
+          break;
+        }
       } else {
         bulletCount++;
         f = false;
@@ -495,9 +540,56 @@ function checkHitPlayer() {
   }
 }
 
+// function getBonus() {
+//   function getRandomInt1(max) {
+//     return Math.floor(Math.random() * max);
+//   }
+
+//   function getRandomInt2(max) {
+//     return Math.floor(Math.random() * max);
+//   }
+
+//   let bonusButton1 = document.querySelector(`#getBonusButton1`);
+//   let bonusButton2 = document.querySelector(`#getBonusButton2`);
+
+//   function getRandomBonus1(numBonus) {
+//     switch (numBonus) {
+//       case 0:
+//         bonusButton1.innerHTML = `HP + 1`;
+//         bonusButton1.onclick = function () {
+//           unitPlayer.HP = unitPlayer.HP + 1;
+//         };
+//         break;
+//       case 1:
+//         bonusButton1.innerHTML = `ATK + 1`;
+//         bonusButton1.onclick = function () {
+//           unitPlayer.ATK = unitPlayer.ATK + 1;
+//         };
+//         break;
+//     }
+//   }
+//   function getRandomBonus2(numBonus) {
+//     switch (numBonus) {
+//       case 0:
+//         bonusButton2.innerHTML = `HP + 1`;
+//         unitPlayer.HP = unitPlayer.HP + 1;
+//         break;
+//       case 1:
+//         bonusButton2.innerHTML = `ATK + 1`;
+//         unitPlayer.ATK = unitPlayer.ATK + 1;
+//         break;
+//     }
+//   }
+
+//   if (score === 1) {
+//     score++;
+//     getRandomBonus1(getRandomInt1(2));
+//     getRandomBonus2(getRandomInt2(2));
+//   }
+// }
 function gameloop() {
   if (unitPlayer.HP <= 0) {
-    alert(`Ви сдохли`);
+    alert(`Потрачено`);
     location.reload();
   } else {
     window.requestAnimationFrame(gameloop);
@@ -507,10 +599,12 @@ function gameloop() {
     unitPlayer.shot();
     unitPlayer.refreshWeaponCD();
     moveBullets();
-    spawnTimeEnemies();
+    spawnTimeEnemiesT1();
+    spawnTimeEnemiesT2();
     enemyMove();
     killEnemy();
     checkHitPlayer();
+    // getBonus();
   }
 }
 

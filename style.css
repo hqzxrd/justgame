@@ -20,6 +20,7 @@ canvas {
   position: relative;
   left: 350px;
   user-select: none;
+  pointer-events: none;
 }
 
 #score {
@@ -111,6 +112,13 @@ canvas {
   border-radius: 8px;
 }
 
+.nameOfButton {
+  position: absolute;
+  left: 3px;
+  font-size: 10px;
+  color: #fff;
+}
+
 .cd3 {
   position: relative;
   color: aquamarine;
@@ -152,4 +160,23 @@ canvas {
   top: -70px;
   left: 25px;
   z-index: 1;
+}
+
+.getBonus {
+  position: absolute;
+  top: 400px;
+  left: 485px;
+  background: #000;
+  color: white;
+  display: flex;
+  gap: 15px;
+  user-select: none;
+  pointer-events: All;
+}
+
+#getBonusButton1 {
+  cursor: pointer;
+}
+#getBonusButton2 {
+  cursor: pointer;
 }
