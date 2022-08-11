@@ -18,7 +18,6 @@ let bulletArr = [];
 let enemiesArr = [];
 let bulletType;
 let score = 0;
-
 ////////////////////////////////////////////CLASS
 
 class Player {
@@ -36,7 +35,13 @@ class Player {
     this.moveRight = false;
     this.shooting = false;
     this.vel = new Vector2(0, 0);
-    this.weapon = [new pistol(), new shotgun(), new circleShot()];
+    this.weapon = [
+      new pistol(),
+      new shotgun(),
+      new circleShot(),
+      // new shieldSpinnerShot(),
+    ];
+    console.log(this.weapon[2]);
     this.curSlot = 0;
     this.mouseX = 0;
     this.mouseY = 0;
@@ -145,6 +150,14 @@ class circleShot extends weapon {
   }
 }
 
+class shieldSpinnerShot extends weapon {
+  constructor() {
+    super();
+    this.type = 4;
+    this.CD = 15000;
+  }
+}
+
 class defaultBullet {
   constructor(x, y, angle) {
     this.pos = new Vector2(x, y);
@@ -224,6 +237,27 @@ class circleShotBullet extends defaultBullet {
   }
 }
 
+class shieldSpinnerBullet extends defaultBullet {
+  constructor(x, y, angle) {
+    super(x, y, angle);
+    this.degPerFrame = 6;
+    this.bulletSprite = orb1;
+    this.size = 25;
+    this.dmg = this.dmg + unitPlayer.ATK;
+    this.dist = 70;
+    this.bulletRange = 1000;
+  }
+  moveBullet() {
+    this.angle = this.angle * RAD2DEG;
+    this.angle += this.degPerFrame;
+    this.angle %= 360;
+    this.angle = this.angle * DEG2RAD;
+    let vectorTemp = new Vector2(this.dist, 0).rotateTo(this.angle);
+    this.pos.set(vectorTemp.add(unitPlayer.pos));
+    this.initialPos.set(unitPlayer.pos);
+  }
+}
+
 let unitPlayer = new Player(GG, 550, 400, 3, 100, 100);
 ////////////////////////////////////////////EVENT
 
@@ -294,7 +328,7 @@ window.addEventListener(`keydown`, function (e) {
 window.addEventListener(`keyup`, function (e) {
   if (e.code == `Space`) {
     if (unitPlayer.weapon[2].curCD > 1) {
-      unitPlayer.shooting = true;
+      // unitPlayer.shooting = true;
       unitPlayer.curSlot = curSlot;
     } else {
       unitPlayer.curSlot = 2;
@@ -355,6 +389,20 @@ function shot(unit, targetPos, weaponType) {
         );
       }
       break;
+    case 4:
+      bulletType = weaponType;
+      let vectorTemp;
+      let bullets = 5;
+      for (let i = 0; i < 360; i += 360 / bullets) {
+        vectorTemp = new Vector2(30, 0)
+          .add(unitPlayer.pos)
+          .rotateTo(i * DEG2RAD);
+        bulletArr.push(
+          new shieldSpinnerBullet(vectorTemp.x, vectorTemp.y, i * DEG2RAD)
+        );
+        console.log(`Цикл`, i, bulletArr);
+      }
+      break;
     default:
       throw `Wrong weapon type`;
   }
@@ -366,6 +414,7 @@ function moveBullets() {
   while (i < bulletArr.length) {
     if (bulletArr[i].checkRange()) {
       delete bulletArr[i];
+      console.log(`Пуля удолена ы`);
     } else {
       bulletArr[i].moveBullet();
       bulletArr[i].drawBullet();
@@ -417,33 +466,48 @@ function drawBackground() {
   }
   if (bulletType === 3) {
     ct.save();
-    ct.fillStyle = `rgba(139, 0, 0, 0.2)`;
+    ct.fillStyle = `rgba(255, 255, 255, 0.5)`;
     ct.fillRect(0, 0, cv.width, cv.height);
     ct.restore();
   }
+
+  // ct.fillStyle = `white`;
+  // ct.fillRect(0, 0, cv.width, cv.height);
 }
 
 let lastSpawnTimeT1 = 0;
-let intervalT1 = 1500;
+let intervalT1 = 1000;
+let maxReachedT1 = false;
 function spawnTimeEnemiesT1() {
   let curTime = new Date();
 
   if (curTime - lastSpawnTimeT1 >= intervalT1) {
-    if (intervalT1 > 400) {
+    if (intervalT1 > 400 && !maxReachedT1) {
       intervalT1 -= Math.ceil(0.01 * intervalT1);
+    } else {
+      maxReachedT1 = true;
+    }
+    if (maxReachedT1) {
+      intervalT1 += Math.ceil(0.002 * intervalT1);
     }
     lastSpawnTimeT1 = curTime;
     spawnEnemiesT1();
   }
 }
 let lastSpawnTimeT2 = 0;
-let intervalT2 = 15000;
+let intervalT2 = 2000;
+let maxReachedT2 = false;
 function spawnTimeEnemiesT2() {
   let curTime = new Date();
 
-  if (curTime - lastSpawnTimeT2 >= intervalT2 && enemiesArr.length > 7) {
-    if (intervalT2 > 12000) {
+  if (curTime - lastSpawnTimeT2 >= intervalT2 && maxReachedT1) {
+    if (intervalT2 > 800 && !maxReachedT2) {
       intervalT2 -= Math.ceil(0.01 * intervalT2);
+    } else {
+      maxReachedT2 = true;
+    }
+    if (maxReachedT2) {
+      intervalT2 += Math.ceil(0.01 * intervalT2);
     }
     lastSpawnTimeT2 = curTime;
     spawnEnemiesT2();
@@ -540,58 +604,128 @@ function checkHitPlayer() {
   }
 }
 
-// function getBonus() {
-//   function getRandomInt1(max) {
-//     return Math.floor(Math.random() * max);
-//   }
+let scoreBoneses = [0, 35, 100, 200];
 
-//   function getRandomInt2(max) {
-//     return Math.floor(Math.random() * max);
-//   }
+function checkBonus() {
+  if (score >= scoreBoneses[0]) {
+    getbonus.style.display = `flex`;
+    pauseMode = true;
+    getBonus();
+  }
+}
 
-//   let bonusButton1 = document.querySelector(`#getBonusButton1`);
-//   let bonusButton2 = document.querySelector(`#getBonusButton2`);
+function deleteBonus() {
+  if (score >= scoreBoneses[0]) {
+    scoreBoneses.splice(0, 1);
+    pauseMode = false;
+    getbonus.style.display = `none`;
+  }
+}
 
-//   function getRandomBonus1(numBonus) {
-//     switch (numBonus) {
-//       case 0:
-//         bonusButton1.innerHTML = `HP + 1`;
-//         bonusButton1.onclick = function () {
-//           unitPlayer.HP = unitPlayer.HP + 1;
-//         };
-//         break;
-//       case 1:
-//         bonusButton1.innerHTML = `ATK + 1`;
-//         bonusButton1.onclick = function () {
-//           unitPlayer.ATK = unitPlayer.ATK + 1;
-//         };
-//         break;
-//     }
-//   }
-//   function getRandomBonus2(numBonus) {
-//     switch (numBonus) {
-//       case 0:
-//         bonusButton2.innerHTML = `HP + 1`;
-//         unitPlayer.HP = unitPlayer.HP + 1;
-//         break;
-//       case 1:
-//         bonusButton2.innerHTML = `ATK + 1`;
-//         unitPlayer.ATK = unitPlayer.ATK + 1;
-//         break;
-//     }
-//   }
+let getbonus = document.querySelector(`.getBonus`);
+function getBonus() {
+  function getRandomInt1(max) {
+    return Math.floor(Math.random() * max);
+  }
 
-//   if (score === 1) {
-//     score++;
-//     getRandomBonus1(getRandomInt1(2));
-//     getRandomBonus2(getRandomInt2(2));
-//   }
-// }
+  function getRandomInt2(max) {
+    return Math.floor(Math.random() * max);
+  }
+
+  let bonusButton1 = document.querySelector(`#getBonusButton1`);
+  let bonusButton2 = document.querySelector(`#getBonusButton2`);
+
+  function getRandomBonus1(numBonus) {
+    switch (numBonus) {
+      case 0:
+        bonusButton1.innerHTML = `HP + 1`;
+        bonusButton1.onclick = function () {
+          unitPlayer.HP = unitPlayer.HP + 1;
+          deleteBonus();
+        };
+        break;
+      case 1:
+        bonusButton1.innerHTML = `ATK + 1`;
+        bonusButton1.onclick = function () {
+          unitPlayer.ATK = unitPlayer.ATK + 1;
+          deleteBonus();
+        };
+        break;
+      case 2:
+        bonusButton1.innerHTML = `Shield Spinner Ultimate`;
+        bonusButton1.onclick = function () {
+          unitPlayer.weapon[2] = new shieldSpinnerShot();
+          deleteBonus();
+        };
+        break;
+      case 3:
+        bonusButton1.innerHTML = `Circle Shot Ultimate`;
+        bonusButton1.onclick = function () {
+          unitPlayer.weapon[2] = new circleShot();
+          deleteBonus();
+        };
+        break;
+    }
+  }
+  function getRandomBonus2(numBonus) {
+    switch (numBonus) {
+      case 0:
+        bonusButton2.innerHTML = `HP + 1`;
+        bonusButton2.onclick = function () {
+          unitPlayer.HP = unitPlayer.HP + 1;
+          deleteBonus();
+        };
+
+        break;
+      case 1:
+        bonusButton2.innerHTML = `ATK + 1`;
+        bonusButton2.onclick = function () {
+          unitPlayer.ATK = unitPlayer.ATK + 1;
+          deleteBonus();
+        };
+        break;
+      // case 2:
+      //   bonusButton2.innerHTML = `Shield Spinner Ultimate`;
+      //   bonusButton2.onclick = function () {
+      //     unitPlayer.weapon[2] = new shieldSpinnerShot();
+      //     deleteBonus();
+      //   };
+      // case 3:
+      //   bonusButton2.innerHTML = `Circle Shot Ultimate`;
+      //   bonusButton2.onclick = function () {
+      //     unitPlayer.weapon[2] = new circleShot();
+      //     deleteBonus();
+      //   };
+      //   break;
+    }
+  }
+
+  getRandomBonus1(getRandomInt1(3));
+  getRandomBonus2(getRandomInt2(2));
+}
+
+let pauseMode = false;
+window.addEventListener(`keydown`, function (e) {
+  if (e.code == `Escape`) {
+    pauseMode = !pauseMode;
+  }
+});
+
+function pause() {
+  if (pauseMode) {
+    window.requestAnimationFrame(pause);
+  } else {
+    window.requestAnimationFrame(gameloop);
+  }
+}
+
 function gameloop() {
+  checkBonus();
   if (unitPlayer.HP <= 0) {
     alert(`Потрачено`);
     location.reload();
-  } else {
+  } else if (!pauseMode) {
+    console.log(bulletArr);
     window.requestAnimationFrame(gameloop);
     drawBackground();
     playerMove();
@@ -604,12 +738,12 @@ function gameloop() {
     enemyMove();
     killEnemy();
     checkHitPlayer();
-    // getBonus();
+  } else {
+    window.requestAnimationFrame(pause);
   }
 }
 
 let startGame = document.querySelector(`.buttonPlay`);
-
 startGame.onclick = function start() {
   document.querySelector(`.hello`).style.display = `none`;
   let bgVideo = document.querySelector(`.bgvideo`);
