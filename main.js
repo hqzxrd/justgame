@@ -877,3 +877,4 @@ startGame.onclick = function start() {
   bgVideo.remove();
   gameloop();
 };
+//
