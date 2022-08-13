@@ -47,7 +47,49 @@ canvas {
 
 #HPnum {
   position: absolute;
-  left: 100px;
+  left: 105px;
+  top: 2px;
+}
+
+#ATK {
+  display: inline-block;
+  position: absolute;
+  top: 175px;
+  left: 50px;
+  font-size: 26px;
+}
+
+#ATKnum {
+  position: absolute;
+  left: 105px;
+  top: 2px;
+}
+
+#ATKSPD {
+  display: inline-block;
+  position: absolute;
+  top: 200px;
+  left: 50px;
+  font-size: 26px;
+}
+
+#ATKSPDnum {
+  position: absolute;
+  left: 105px;
+  top: 2px;
+}
+
+#SPD {
+  display: inline-block;
+  position: absolute;
+  top: 225px;
+  left: 50px;
+  font-size: 26px;
+}
+
+#SPDnum {
+  position: absolute;
+  left: 105px;
   top: 2px;
 }
 
@@ -92,6 +134,28 @@ canvas {
 }
 
 .cd2 {
+  position: relative;
+  color: aquamarine;
+  top: -33px;
+  left: 6px;
+  display: none;
+}
+
+#specialBullet2 {
+  position: absolute;
+  top: 645px;
+  left: 60px;
+  height: 40px;
+  border-radius: 10px;
+  display: none;
+}
+
+#specialBullet2 img {
+  width: 40px;
+  border-radius: 8px;
+}
+
+.cd4 {
   position: relative;
   color: aquamarine;
   top: -33px;

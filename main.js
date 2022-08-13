@@ -11,8 +11,9 @@ let tier1enemy = new Image();
 tier1enemy.src = `assets/tier1enemy.png`;
 let tier2enemy = new Image();
 tier2enemy.src = `assets/tier2enemy.png`;
+let tier1Boss = new Image();
+tier1Boss.src = `assets/tier1boss.png`;
 let orb1 = new Image();
-
 orb1.src = `assets/orb1.png`;
 let bulletArr = [];
 let enemiesArr = [];
@@ -38,21 +39,23 @@ class Player {
     this.weapon = [
       new pistol(),
       new shotgun(),
+      // new whipShot(),
       new circleShot(),
       // new shieldSpinnerShot(),
+      // new whipTele(),
     ];
-    console.log(this.weapon[2]);
     this.curSlot = 0;
     this.mouseX = 0;
     this.mouseY = 0;
     this.HP = 3;
     this.ATK = 1;
+    this.ATKSPD = 1;
   }
   drawPlayer() {
     ct.drawImage(
       this.unit,
-      this.pos.x - this.shiftX,
-      this.pos.y - this.shiftY,
+      this.pos.x - this.shiftX + 10,
+      this.pos.y - this.shiftY + 15,
       this.W,
       this.H
     );
@@ -147,6 +150,7 @@ class circleShot extends weapon {
     super();
     this.type = 3;
     this.CD = 100000;
+    this.caseBonus = 5;
   }
 }
 
@@ -155,6 +159,24 @@ class shieldSpinnerShot extends weapon {
     super();
     this.type = 4;
     this.CD = 15000;
+    this.caseBonus = 4;
+  }
+}
+
+class whipShot extends weapon {
+  constructor() {
+    super();
+    this.type = 5;
+    this.CD = 10;
+    this.caseBonus = 6;
+  }
+}
+
+class whipTele extends weapon {
+  constructor() {
+    super();
+    this.type = 6;
+    this.CD = 8000;
   }
 }
 
@@ -205,7 +227,7 @@ class bullet extends defaultBullet {
   constructor(x, y, angle, dmg) {
     super(x, y, angle);
     this.bulletRange = 600;
-    this.speed = 10;
+    this.speed = 9 + unitPlayer.ATKSPD;
     this.vel = new Vector2(this.speed, 0).rotateTo(this.angle);
     this.bulletSprite = orb1;
     this.size = 50;
@@ -217,7 +239,7 @@ class shotgunBullet extends defaultBullet {
   constructor(x, y, angle, dmg) {
     super(x, y, angle);
     this.bulletRange = 300;
-    this.speed = 15;
+    this.speed = 14 + unitPlayer.ATKSPD;
     this.vel = new Vector2(this.speed, 0).rotateTo(this.angle);
     this.bulletSprite = orb1;
     this.size = 25;
@@ -229,7 +251,7 @@ class circleShotBullet extends defaultBullet {
   constructor(x, y, angle) {
     super(x, y, angle);
     this.bulletRange = 1000;
-    this.speed = 2;
+    this.speed = 1 + unitPlayer.ATKSPD;
     this.vel = new Vector2(this.speed, 0).rotateTo(this.angle);
     this.bulletSprite = orb1;
     this.size = 50;
@@ -240,11 +262,11 @@ class circleShotBullet extends defaultBullet {
 class shieldSpinnerBullet extends defaultBullet {
   constructor(x, y, angle) {
     super(x, y, angle);
-    this.degPerFrame = 6;
+    this.degPerFrame = 5;
     this.bulletSprite = orb1;
     this.size = 25;
     this.dmg = this.dmg + unitPlayer.ATK;
-    this.dist = 70;
+    this.dist = 75;
     this.bulletRange = 1000;
   }
   moveBullet() {
@@ -258,7 +280,32 @@ class shieldSpinnerBullet extends defaultBullet {
   }
 }
 
-let unitPlayer = new Player(GG, 550, 400, 3, 100, 100);
+class whipBullet extends defaultBullet {
+  constructor(x, y, angle) {
+    super(x, y, angle);
+    this.bulletRange = 120;
+    this.speed = 10 + unitPlayer.ATKSPD;
+    this.vel = new Vector2(this.speed, 0).rotateTo(this.angle);
+    this.bulletSprite = orb1;
+    this.size = 15;
+    this.dmg = this.dmg + unitPlayer.ATK * 0.05;
+  }
+}
+
+class whipTeleport extends defaultBullet {
+  constructor(x, y, angle) {
+    super(x, y, angle);
+    this.bulletRange = 350;
+    this.speed = 10 + unitPlayer.ATKSPD;
+    this.vel = new Vector2(this.speed, 0).rotateTo(this.angle);
+    this.bulletSprite = GG;
+    this.size = 100;
+    this.dmg = this.dmg + unitPlayer.ATK;
+    this.bulletType = 1;
+  }
+}
+
+let unitPlayer = new Player(GG, 550, 400, 2, 100, 100);
 ////////////////////////////////////////////EVENT
 
 window.addEventListener(`keydown`, function (e) {
@@ -294,19 +341,28 @@ window.addEventListener(`keyup`, function (e) {
 let bullet1Icon = document.querySelector(`#bullet1`);
 let bullet2Icon = document.querySelector(`#bullet2`);
 let bullet3Icon = document.querySelector(`#bullet3`);
+let bullet4Icon = document.querySelector(`#specialBullet2`);
 let curSlot = 0;
 window.addEventListener(`keydown`, function (e) {
   if (e.code == `Digit1`) {
+    bullet4Icon.style.display = `none`;
     unitPlayer.curSlot = 0;
     curSlot = unitPlayer.curSlot;
     bullet1Icon.style.border = `2px solid violet`;
     bullet1Icon.style.transform = `scale(1.2)`;
     bullet2Icon.style.border = `2px solid black`;
     bullet2Icon.style.transform = `scale(1.0)`;
+    bullet4Icon.style.border = `2px solid black`;
+    bullet4Icon.style.transform = `scale(1.0)`;
   }
   if (e.code == `Digit2`) {
+    if (unitPlayer.weapon[1].type === 5) {
+      bullet4Icon.style.display = `block`;
+    }
     unitPlayer.curSlot = 1;
     curSlot = unitPlayer.curSlot;
+    bullet4Icon.style.border = `2px solid black`;
+    bullet4Icon.style.transform = `scale(1.0)`;
     bullet2Icon.style.border = `2px solid violet`;
     bullet2Icon.style.transform = `scale(1.2)`;
     bullet1Icon.style.border = `2px solid black`;
@@ -323,12 +379,26 @@ window.addEventListener(`keydown`, function (e) {
     bullet3Icon.style.border = `2px solid violet`;
     bullet3Icon.style.transform = `scale(1.2)`;
   }
+  if (e.code == `ShiftLeft`) {
+    if (curSlot === 1) {
+      if (unitPlayer.weapon[3].curCD > 0) {
+        unitPlayer.curSlot = curSlot;
+        unitPlayer.shooting = false;
+        unitPlayer.curSlot = 1;
+      } else {
+        unitPlayer.shooting = true;
+        unitPlayer.curSlot = 3;
+      }
+      bullet4Icon.style.border = `2px solid violet`;
+      bullet4Icon.style.transform = `scale(1.2)`;
+    } else {
+    }
+  }
 });
 
 window.addEventListener(`keyup`, function (e) {
   if (e.code == `Space`) {
     if (unitPlayer.weapon[2].curCD > 1) {
-      // unitPlayer.shooting = true;
       unitPlayer.curSlot = curSlot;
     } else {
       unitPlayer.curSlot = 2;
@@ -336,6 +406,19 @@ window.addEventListener(`keyup`, function (e) {
     }
     bullet3Icon.style.border = `2px solid black`;
     bullet3Icon.style.transform = `scale(1)`;
+  }
+  if (e.code == `ShiftLeft`) {
+    if (curSlot === 1) {
+      if (unitPlayer.weapon[1].curCD > 1) {
+        unitPlayer.shooting = false;
+        unitPlayer.curSlot = curSlot;
+      } else {
+        unitPlayer.curSlot = 1;
+        unitPlayer.shooting = false;
+      }
+      bullet4Icon.style.border = `2px solid black`;
+      bullet4Icon.style.transform = `scale(1)`;
+    }
   }
 });
 
@@ -359,7 +442,7 @@ function shot(unit, targetPos, weaponType) {
       bulletType = weaponType;
       angleAim = targetPos.sub(unit.pos).angle;
       angleAim += (Math.random() * 14 - 7) * DEG2RAD;
-      bulletArr.push(new bullet(unit.pos.x, unit.pos.y, angleAim));
+      bulletArr.push(new bullet(unit.pos.x - 25, unit.pos.y - 25, angleAim));
       break;
     case 2:
       bulletType = weaponType;
@@ -392,7 +475,7 @@ function shot(unit, targetPos, weaponType) {
     case 4:
       bulletType = weaponType;
       let vectorTemp;
-      let bullets = 5;
+      let bullets = 4;
       for (let i = 0; i < 360; i += 360 / bullets) {
         vectorTemp = new Vector2(30, 0)
           .add(unitPlayer.pos)
@@ -400,8 +483,19 @@ function shot(unit, targetPos, weaponType) {
         bulletArr.push(
           new shieldSpinnerBullet(vectorTemp.x, vectorTemp.y, i * DEG2RAD)
         );
-        console.log(`Цикл`, i, bulletArr);
       }
+      break;
+    case 5:
+      bulletType = weaponType;
+      angleAim = targetPos.sub(unit.pos).angle;
+      angleAim += Math.random() * 1 * DEG2RAD;
+      bulletArr.push(new whipBullet(unit.pos.x, unit.pos.y, angleAim));
+      break;
+    case 6:
+      bulletType = weaponType;
+      angleAim = targetPos.sub(unit.pos).angle;
+      angleAim += Math.random() * 1 * DEG2RAD;
+      bulletArr.push(new whipTeleport(unit.pos.x, unit.pos.y, angleAim));
       break;
     default:
       throw `Wrong weapon type`;
@@ -413,12 +507,14 @@ function moveBullets() {
   let temp = [];
   while (i < bulletArr.length) {
     if (bulletArr[i].checkRange()) {
+      console.log(bulletArr[i]);
+      if (bulletArr[i].bulletType === 1 && unitPlayer.curSlot === 1) {
+        unitPlayer.pos = bulletArr[i].pos;
+      }
       delete bulletArr[i];
-      console.log(`Пуля удолена ы`);
     } else {
       bulletArr[i].moveBullet();
       bulletArr[i].drawBullet();
-
       temp.push(bulletArr[i]);
     }
     i++;
@@ -470,9 +566,24 @@ function drawBackground() {
     ct.fillRect(0, 0, cv.width, cv.height);
     ct.restore();
   }
-
-  // ct.fillStyle = `white`;
-  // ct.fillRect(0, 0, cv.width, cv.height);
+  if (bulletType === 4) {
+    ct.save();
+    ct.fillStyle = `rgba(255, 255, 255, 0.5)`;
+    ct.fillRect(0, 0, cv.width, cv.height);
+    ct.restore();
+  }
+  if (bulletType === 5) {
+    ct.save();
+    ct.fillStyle = `rgba(255, 255, 255, 0.2)`;
+    ct.fillRect(0, 0, cv.width, cv.height);
+    ct.restore();
+  }
+  if (bulletType === 6) {
+    ct.save();
+    ct.fillStyle = `rgba(255, 255, 255, 0.2)`;
+    ct.fillRect(0, 0, cv.width, cv.height);
+    ct.restore();
+  }
 }
 
 let lastSpawnTimeT1 = 0;
@@ -494,6 +605,7 @@ function spawnTimeEnemiesT1() {
     spawnEnemiesT1();
   }
 }
+
 let lastSpawnTimeT2 = 0;
 let intervalT2 = 2000;
 let maxReachedT2 = false;
@@ -538,6 +650,9 @@ function spawnEnemiesT2() {
   enemiesArr.push(newEnemy2);
 }
 
+//////////////////////////////////////////////BOSS
+
+//////////////////////////////////////////////BOSS
 function enemyMove() {
   for (let i = 0; i < enemiesArr.length; i++) {
     enemiesArr[i].vel.set(unitPlayer.pos);
@@ -604,109 +719,114 @@ function checkHitPlayer() {
   }
 }
 
-let scoreBoneses = [0, 35, 100, 200];
+let scoreBoneses = [
+  5, 15, 35, 50, 75, 100, 135, 165, 200, 240, 300, 350, 400, 450, 500, 600, 700,
+  800, 900, 1000,
+];
 
+let bonusLock = true;
 function checkBonus() {
   if (score >= scoreBoneses[0]) {
+    bonusLock = false;
     getbonus.style.display = `flex`;
     pauseMode = true;
-    getBonus();
+    for (let i = 0; i < 2; i++) {
+      getBonus(getRandomInt(101), i);
+    }
   }
 }
 
 function deleteBonus() {
   if (score >= scoreBoneses[0]) {
     scoreBoneses.splice(0, 1);
+    bonusLock = true;
     pauseMode = false;
     getbonus.style.display = `none`;
   }
 }
 
+let bonusButton1 = document.querySelector(`#getBonusButton1`);
+let bonusButton2 = document.querySelector(`#getBonusButton2`);
+let buttons = [bonusButton1, bonusButton2];
 let getbonus = document.querySelector(`.getBonus`);
-function getBonus() {
-  function getRandomInt1(max) {
-    return Math.floor(Math.random() * max);
+
+function getRandomInt(max) {
+  return Math.floor(Math.random() * max);
+}
+
+function getBonus(numBonus, n) {
+  if (numBonus < 30) {
+    numBonus = 0;
+  } else if (numBonus >= 30 && numBonus <= 50) {
+    numBonus = 1;
+  } else if (numBonus >= 51 && numBonus <= 70) {
+    numBonus = 2;
+  } else if (numBonus >= 71 && numBonus <= 80) {
+    numBonus = 3;
+  } else if (numBonus >= 81 && numBonus <= 90) {
+    numBonus = 4;
+  } else if (numBonus >= 91 && numBonus <= 100) {
+    numBonus = 6;
   }
-
-  function getRandomInt2(max) {
-    return Math.floor(Math.random() * max);
+  if (unitPlayer.weapon[2].caseBonus == numBonus) {
+    getBonus(getRandomInt(101), n);
+    return;
   }
-
-  let bonusButton1 = document.querySelector(`#getBonusButton1`);
-  let bonusButton2 = document.querySelector(`#getBonusButton2`);
-
-  function getRandomBonus1(numBonus) {
-    switch (numBonus) {
-      case 0:
-        bonusButton1.innerHTML = `HP + 1`;
-        bonusButton1.onclick = function () {
-          unitPlayer.HP = unitPlayer.HP + 1;
-          deleteBonus();
-        };
-        break;
-      case 1:
-        bonusButton1.innerHTML = `ATK + 1`;
-        bonusButton1.onclick = function () {
-          unitPlayer.ATK = unitPlayer.ATK + 1;
-          deleteBonus();
-        };
-        break;
-      case 2:
-        bonusButton1.innerHTML = `Shield Spinner Ultimate`;
-        bonusButton1.onclick = function () {
-          unitPlayer.weapon[2] = new shieldSpinnerShot();
-          deleteBonus();
-        };
-        break;
-      case 3:
-        bonusButton1.innerHTML = `Circle Shot Ultimate`;
-        bonusButton1.onclick = function () {
-          unitPlayer.weapon[2] = new circleShot();
-          deleteBonus();
-        };
-        break;
-    }
+  if (unitPlayer.weapon[1].caseBonus == numBonus) {
+    getBonus(getRandomInt(101), n);
+    return;
   }
-  function getRandomBonus2(numBonus) {
-    switch (numBonus) {
-      case 0:
-        bonusButton2.innerHTML = `HP + 1`;
-        bonusButton2.onclick = function () {
-          unitPlayer.HP = unitPlayer.HP + 1;
-          deleteBonus();
-        };
-
-        break;
-      case 1:
-        bonusButton2.innerHTML = `ATK + 1`;
-        bonusButton2.onclick = function () {
-          unitPlayer.ATK = unitPlayer.ATK + 1;
-          deleteBonus();
-        };
-        break;
-      // case 2:
-      //   bonusButton2.innerHTML = `Shield Spinner Ultimate`;
-      //   bonusButton2.onclick = function () {
-      //     unitPlayer.weapon[2] = new shieldSpinnerShot();
-      //     deleteBonus();
-      //   };
-      // case 3:
-      //   bonusButton2.innerHTML = `Circle Shot Ultimate`;
-      //   bonusButton2.onclick = function () {
-      //     unitPlayer.weapon[2] = new circleShot();
-      //     deleteBonus();
-      //   };
-      //   break;
-    }
+  console.log(numBonus);
+  switch (numBonus) {
+    case 0:
+      buttons[n].innerHTML = `HP + 1`;
+      buttons[n].onclick = function () {
+        unitPlayer.HP = unitPlayer.HP + 1;
+        deleteBonus();
+      };
+      break;
+    case 1:
+      buttons[n].innerHTML = `ATK + 1`;
+      buttons[n].onclick = function () {
+        unitPlayer.ATK = unitPlayer.ATK + 1;
+        deleteBonus();
+      };
+      break;
+    case 2:
+      buttons[n].innerHTML = `ATKSPD + 1`;
+      buttons[n].onclick = function () {
+        unitPlayer.ATKSPD = unitPlayer.ATKSPD + 1;
+        deleteBonus();
+      };
+      break;
+    case 3:
+      buttons[n].innerHTML = `SPD + 0.3`;
+      buttons[n].onclick = function () {
+        unitPlayer.speed = unitPlayer.speed + 0.3;
+        deleteBonus();
+      };
+      break;
+    case 4:
+      buttons[n].innerHTML = `Shield Spinner [Space]`;
+      buttons[n].onclick = function () {
+        unitPlayer.weapon[2] = new shieldSpinnerShot();
+        deleteBonus();
+      };
+      break;
+    case 6:
+      buttons[n].innerHTML = `Whip Teleport [2]`;
+      buttons[n].onclick = function () {
+        unitPlayer.weapon[1] = new whipShot();
+        unitPlayer.weapon[3] = new whipTele();
+        deleteBonus();
+      };
+      break;
   }
-
-  getRandomBonus1(getRandomInt1(3));
-  getRandomBonus2(getRandomInt2(2));
 }
 
 let pauseMode = false;
 window.addEventListener(`keydown`, function (e) {
-  if (e.code == `Escape`) {
+  if (e.code == `Escape` && bonusLock === true) {
     pauseMode = !pauseMode;
   }
 });
@@ -719,14 +839,21 @@ function pause() {
   }
 }
 
+function stats() {
+  document.querySelector(`#HPnum`).innerHTML = unitPlayer.HP;
+  document.querySelector(`#ATKnum`).innerHTML = unitPlayer.ATK;
+  document.querySelector(`#ATKSPDnum`).innerHTML = unitPlayer.ATKSPD;
+  document.querySelector(`#SPDnum`).innerHTML = unitPlayer.speed;
+}
+
 function gameloop() {
-  checkBonus();
   if (unitPlayer.HP <= 0) {
     alert(`Потрачено`);
     location.reload();
   } else if (!pauseMode) {
-    console.log(bulletArr);
     window.requestAnimationFrame(gameloop);
+    checkBonus();
+    stats();
     drawBackground();
     playerMove();
     unitPlayer.drawPlayer();
