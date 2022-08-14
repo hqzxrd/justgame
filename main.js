@@ -23,12 +23,24 @@ let orb4 = new Image();
 orb4.src = `assets/orb4.png`;
 let orb5 = new Image();
 orb5.src = `assets/orb5.png`;
+let bg = new Image();
+bg.src = `assets/bg.jpg`;
 let bulletArr = [];
 let enemiesArr = [];
 let bulletType;
 let score = 0;
 let reduceCD = 1;
 ////////////////////////////////////////////CLASS
+
+class render {
+  constructor() {
+    this.camera.pos = new Vector2(
+      unitPlayer.pos.x - 600,
+      unitPlayer.pos.y - 400
+    );
+  }
+  render() {}
+}
 
 class Player {
   constructor(unit, x, y, speed, W, H) {
@@ -63,8 +75,10 @@ class Player {
   drawPlayer() {
     ct.drawImage(
       this.unit,
-      this.pos.x - this.shiftX + 10,
-      this.pos.y - this.shiftY + 15,
+      // this.pos.x - this.shiftX + 10,
+      // this.pos.y - this.shiftY + 15,
+      600 - this.shiftX + 10,
+      400 - this.shiftY + 15,
       this.W,
       this.H
     );
@@ -78,7 +92,7 @@ class Player {
     ) {
       shot(
         this,
-        new Vector2(this.mouseX, this.mouseY),
+        local2Global(new Vector2(this.mouseX, this.mouseY)),
         this.weapon[this.curSlot].type
       );
       this.weapon[this.curSlot].lastShotTime = curTime;
@@ -94,6 +108,13 @@ class Player {
         cd.innerHTML = Math.ceil(this.weapon[i].curCD / 100) / 10;
         cd.style.display = `block`;
       }
+    }
+  }
+  checkOutOfBounds(vec) {
+    if (vec.x < 600 || vec.y < 400 || vec.x > 3000 || vec.y > 2000) {
+      return true;
+    } else {
+      return false;
     }
   }
 }
@@ -115,8 +136,8 @@ class enemy {
   drawEnemy() {
     ct.drawImage(
       this.unit,
-      this.pos.x - this.shiftX + 30,
-      this.pos.y - this.shiftY + 25,
+      global2Local(this.pos).x - this.shiftX + 30,
+      global2Local(this.pos).y - this.shiftY + 25,
       this.W,
       this.H
     );
@@ -207,8 +228,8 @@ class defaultBullet {
   drawBullet() {
     ct.drawImage(
       this.bulletSprite,
-      this.pos.x,
-      this.pos.y,
+      global2Local(this.pos).x,
+      global2Local(this.pos).y,
       this.size,
       this.size
     );
@@ -313,7 +334,7 @@ class flowTeleport extends defaultBullet {
   }
 }
 
-let unitPlayer = new Player(GG, 550, 400, 2, 100, 100);
+let unitPlayer = new Player(GG, 1900, 1200, 2, 100, 100);
 ////////////////////////////////////////////EVENT
 
 window.addEventListener(`keydown`, function (e) {
@@ -518,7 +539,11 @@ function moveBullets() {
   let temp = [];
   while (i < bulletArr.length) {
     if (bulletArr[i].checkRange()) {
-      if (bulletArr[i].bulletType === 1 && unitPlayer.curSlot === 1) {
+      if (
+        bulletArr[i].bulletType === 1 &&
+        unitPlayer.curSlot === 1 &&
+        !unitPlayer.checkOutOfBounds(bulletArr[i].pos)
+      ) {
         unitPlayer.pos = bulletArr[i].pos;
       }
       delete bulletArr[i];
@@ -548,62 +573,80 @@ function playerMove() {
   }
   unitPlayer.vel.normalize();
   unitPlayer.vel.mult(unitPlayer.speed);
-  unitPlayer.pos.add(unitPlayer.vel);
+  let temp = new Vector2(0, 0).set(unitPlayer.pos).add(unitPlayer.vel);
+  if (!unitPlayer.checkOutOfBounds(temp)) {
+    unitPlayer.pos.set(temp);
+  }
 }
 
 function drawBackground() {
+  let temp = new Vector2(unitPlayer.pos.x - 600, unitPlayer.pos.y - 400);
   if (bulletType === undefined) {
     ct.save();
-    ct.fillStyle = `rgba(255, 255, 255, 0.3)`;
-    ct.fillRect(0, 0, cv.width, cv.height);
+    ct.globalAlpha = 0.6;
+    ct.drawImage(bg, -temp.x, -temp.y, 3600, 2400);
     ct.restore();
   }
   if (bulletType === 1) {
     ct.save();
-    ct.fillStyle = `rgba(255, 255, 255, 0.3)`;
-    ct.fillRect(0, 0, cv.width, cv.height);
+    ct.globalAlpha = 0.4;
+    ct.drawImage(bg, -temp.x, -temp.y, 3600, 2400);
     ct.restore();
   }
   if (bulletType === 2) {
     ct.save();
-    ct.fillStyle = `rgba(255, 255, 255, 0.9)`;
-    ct.fillRect(0, 0, cv.width, cv.height);
+    ct.globalAlpha = 0.9;
+    ct.drawImage(bg, -temp.x, -temp.y, 3600, 2400);
     ct.restore();
   }
   if (bulletType === 3) {
     ct.save();
-    ct.fillStyle = `rgba(255, 255, 255, 0.5)`;
-    ct.fillRect(0, 0, cv.width, cv.height);
+    ct.globalAlpha = 0.5;
+    ct.drawImage(bg, -temp.x, -temp.y, 3600, 2400);
     ct.restore();
   }
   if (bulletType === 4) {
     ct.save();
-    ct.fillStyle = `rgba(255, 255, 255, 0.5)`;
-    ct.fillRect(0, 0, cv.width, cv.height);
+    ct.globalAlpha = 0.5;
+    ct.drawImage(bg, -temp.x, -temp.y, 3600, 2400);
     ct.restore();
   }
   if (bulletType === 5) {
     ct.save();
-    ct.fillStyle = `rgba(255, 255, 255, 0.2)`;
-    ct.fillRect(0, 0, cv.width, cv.height);
+    ct.globalAlpha = 0.4;
+    ct.drawImage(bg, -temp.x, -temp.y, 3600, 2400);
     ct.restore();
   }
   if (bulletType === 6) {
     ct.save();
-    ct.fillStyle = `rgba(255, 255, 255, 0.2)`;
-    ct.fillRect(0, 0, cv.width, cv.height);
+    ct.globalAlpha = 0.4;
+    ct.drawImage(bg, -temp.x, -temp.y, 3600, 2400);
     ct.restore();
   }
 }
 
+function global2Local(vec) {
+  let temp = new Vector2(0, 0)
+    .set(vec)
+    .sub(new Vector2(unitPlayer.pos.x - 600, unitPlayer.pos.y - 400));
+  return temp;
+}
+
+function local2Global(vec) {
+  let temp = new Vector2(unitPlayer.pos.x - 600, unitPlayer.pos.y - 400).add(
+    vec
+  );
+  return temp;
+}
+
 let lastSpawnTimeT1 = 0;
-let intervalT1 = 1500;
+let intervalT1 = 1000;
 let maxReachedT1 = false;
 function spawnTimeEnemiesT1() {
   let curTime = new Date();
 
   if (curTime - lastSpawnTimeT1 >= intervalT1) {
-    if (intervalT1 > 400 && !maxReachedT1) {
+    if (intervalT1 > 200 && !maxReachedT1) {
       intervalT1 -= Math.ceil(0.01 * intervalT1);
     } else {
       maxReachedT1 = true;
@@ -617,13 +660,13 @@ function spawnTimeEnemiesT1() {
 }
 
 let lastSpawnTimeT2 = 0;
-let intervalT2 = 2000;
+let intervalT2 = 1500;
 let maxReachedT2 = false;
 function spawnTimeEnemiesT2() {
   let curTime = new Date();
 
   if (curTime - lastSpawnTimeT2 >= intervalT2 && maxReachedT1) {
-    if (intervalT2 > 500 && !maxReachedT2) {
+    if (intervalT2 > 200 && !maxReachedT2) {
       intervalT2 -= Math.ceil(0.01 * intervalT2);
     } else {
       maxReachedT2 = true;
@@ -637,7 +680,7 @@ function spawnTimeEnemiesT2() {
 }
 
 function spawnEnemiesT1() {
-  let vecCenter = new Vector2(cv.width / 2, cv.height / 2);
+  let vecCenter = local2Global(new Vector2(cv.width / 2, cv.height / 2));
   let vecEnemy = new Vector2(cv.width / 2 + 100, 0);
   vecEnemy.rotateTo(Math.random() * 360 * DEG2RAD);
   vecEnemy.add(vecCenter);
@@ -648,7 +691,7 @@ function spawnEnemiesT1() {
 }
 
 function spawnEnemiesT2() {
-  let vecCenter = new Vector2(cv.width / 2, cv.height / 2);
+  let vecCenter = local2Global(new Vector2(cv.width / 2, cv.height / 2));
   let vecEnemy = new Vector2(cv.width / 2 + 100, 0);
   vecEnemy.rotateTo(Math.random() * 360 * DEG2RAD);
   vecEnemy.add(vecCenter);
@@ -730,8 +773,8 @@ function checkHitPlayer() {
 }
 
 let scoreBoneses = [
-  5, 10, 25, 50, 75, 100, 135, 165, 200, 240, 300, 350, 400, 450, 500, 600, 700,
-  800, 900, 1000,
+  10, 25, 50, 75, 10, 150, 175, 200, 240, 300, 350, 400, 450, 500, 600, 700,
+  800, 900, 1000, 1100, 1200, 1300, 1400, 1500,
 ];
 
 let bonusLock = true;
