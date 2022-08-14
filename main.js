@@ -15,10 +15,19 @@ let tier1Boss = new Image();
 tier1Boss.src = `assets/tier1boss.png`;
 let orb1 = new Image();
 orb1.src = `assets/orb1.png`;
+let orb2 = new Image();
+orb2.src = `assets/orb2.png`;
+let orb3 = new Image();
+orb3.src = `assets/orb3.png`;
+let orb4 = new Image();
+orb4.src = `assets/orb4.png`;
+let orb5 = new Image();
+orb5.src = `assets/orb5.png`;
 let bulletArr = [];
 let enemiesArr = [];
 let bulletType;
 let score = 0;
+let reduceCD = 1;
 ////////////////////////////////////////////CLASS
 
 class Player {
@@ -39,10 +48,10 @@ class Player {
     this.weapon = [
       new pistol(),
       new shotgun(),
-      // new whipShot(),
+      // new flowShot(),
       new circleShot(),
       // new shieldSpinnerShot(),
-      // new whipTele(),
+      // new flowTele(),
     ];
     this.curSlot = 0;
     this.mouseX = 0;
@@ -133,7 +142,7 @@ class pistol extends weapon {
   constructor() {
     super();
     this.type = 1;
-    this.CD = 300;
+    this.CD = 300 * reduceCD;
   }
 }
 
@@ -141,7 +150,7 @@ class shotgun extends weapon {
   constructor() {
     super();
     this.type = 2;
-    this.CD = 600;
+    this.CD = 600 * reduceCD;
   }
 }
 
@@ -149,8 +158,7 @@ class circleShot extends weapon {
   constructor() {
     super();
     this.type = 3;
-    this.CD = 100000;
-    this.caseBonus = 5;
+    this.CD = 60000 * reduceCD;
   }
 }
 
@@ -158,25 +166,25 @@ class shieldSpinnerShot extends weapon {
   constructor() {
     super();
     this.type = 4;
-    this.CD = 15000;
+    this.CD = 12000 * reduceCD;
     this.caseBonus = 4;
   }
 }
 
-class whipShot extends weapon {
+class flowShot extends weapon {
   constructor() {
     super();
     this.type = 5;
-    this.CD = 10;
-    this.caseBonus = 6;
+    this.CD = 10 * reduceCD;
+    this.caseBonus = 5;
   }
 }
 
-class whipTele extends weapon {
+class flowTele extends weapon {
   constructor() {
     super();
     this.type = 6;
-    this.CD = 8000;
+    this.CD = 8000 * reduceCD;
   }
 }
 
@@ -241,7 +249,7 @@ class shotgunBullet extends defaultBullet {
     this.bulletRange = 300;
     this.speed = 14 + unitPlayer.ATKSPD;
     this.vel = new Vector2(this.speed, 0).rotateTo(this.angle);
-    this.bulletSprite = orb1;
+    this.bulletSprite = orb2;
     this.size = 25;
     this.dmg = this.dmg + unitPlayer.ATK;
   }
@@ -253,8 +261,8 @@ class circleShotBullet extends defaultBullet {
     this.bulletRange = 1000;
     this.speed = 1 + unitPlayer.ATKSPD;
     this.vel = new Vector2(this.speed, 0).rotateTo(this.angle);
-    this.bulletSprite = orb1;
-    this.size = 50;
+    this.bulletSprite = orb3;
+    this.size = 20;
     this.dmg = this.dmg + unitPlayer.ATK;
   }
 }
@@ -263,7 +271,7 @@ class shieldSpinnerBullet extends defaultBullet {
   constructor(x, y, angle) {
     super(x, y, angle);
     this.degPerFrame = 5;
-    this.bulletSprite = orb1;
+    this.bulletSprite = orb4;
     this.size = 25;
     this.dmg = this.dmg + unitPlayer.ATK;
     this.dist = 75;
@@ -280,23 +288,23 @@ class shieldSpinnerBullet extends defaultBullet {
   }
 }
 
-class whipBullet extends defaultBullet {
+class flowBullet extends defaultBullet {
   constructor(x, y, angle) {
     super(x, y, angle);
     this.bulletRange = 120;
-    this.speed = 10 + unitPlayer.ATKSPD;
+    this.speed = 2 + unitPlayer.ATKSPD;
     this.vel = new Vector2(this.speed, 0).rotateTo(this.angle);
-    this.bulletSprite = orb1;
-    this.size = 15;
+    this.bulletSprite = orb5;
+    this.size = 20;
     this.dmg = this.dmg + unitPlayer.ATK * 0.05;
   }
 }
 
-class whipTeleport extends defaultBullet {
+class flowTeleport extends defaultBullet {
   constructor(x, y, angle) {
     super(x, y, angle);
     this.bulletRange = 350;
-    this.speed = 10 + unitPlayer.ATKSPD;
+    this.speed = 9 + unitPlayer.ATKSPD;
     this.vel = new Vector2(this.speed, 0).rotateTo(this.angle);
     this.bulletSprite = GG;
     this.size = 100;
@@ -460,7 +468,7 @@ function shot(unit, targetPos, weaponType) {
     case 3:
       bulletType = weaponType;
       targetPos.sub(unit.pos);
-      for (let i = 0.3; i < 100; i += 0.3) {
+      for (let i = 0.3; i < 50; i += 0.3) {
         bulletArr.push(
           new circleShotBullet(unit.pos.x, unit.pos.y, targetPos.angle)
         );
@@ -488,14 +496,17 @@ function shot(unit, targetPos, weaponType) {
     case 5:
       bulletType = weaponType;
       angleAim = targetPos.sub(unit.pos).angle;
-      angleAim += Math.random() * 1 * DEG2RAD;
-      bulletArr.push(new whipBullet(unit.pos.x, unit.pos.y, angleAim));
+      angleAim += (Math.random() * 1 - 0.5) * DEG2RAD;
+      bulletArr.push(new flowBullet(unit.pos.x, unit.pos.y, angleAim));
       break;
     case 6:
       bulletType = weaponType;
       angleAim = targetPos.sub(unit.pos).angle;
       angleAim += Math.random() * 1 * DEG2RAD;
-      bulletArr.push(new whipTeleport(unit.pos.x, unit.pos.y, angleAim));
+      for (let i = 0; i < 50; i++) {
+        bulletArr.push(new flowTeleport(unit.pos.x, unit.pos.y, angleAim));
+      }
+
       break;
     default:
       throw `Wrong weapon type`;
@@ -720,18 +731,18 @@ function checkHitPlayer() {
 }
 
 let scoreBoneses = [
-  5, 15, 35, 50, 75, 100, 135, 165, 200, 240, 300, 350, 400, 450, 500, 600, 700,
+  5, 10, 25, 50, 75, 100, 135, 165, 200, 240, 300, 350, 400, 450, 500, 600, 700,
   800, 900, 1000,
 ];
 
 let bonusLock = true;
 function checkBonus() {
   if (score >= scoreBoneses[0]) {
-    bonusLock = false;
+    // bonusLock = false;
     getbonus.style.display = `flex`;
     pauseMode = true;
     for (let i = 0; i < 2; i++) {
-      getBonus(getRandomInt(101), i);
+      getBonus(getRandomInt(111), i);
     }
   }
 }
@@ -766,14 +777,16 @@ function getBonus(numBonus, n) {
   } else if (numBonus >= 81 && numBonus <= 90) {
     numBonus = 4;
   } else if (numBonus >= 91 && numBonus <= 100) {
+    numBonus = 5;
+  } else if (numBonus >= 101 && numBonus <= 110) {
     numBonus = 6;
   }
   if (unitPlayer.weapon[2].caseBonus == numBonus) {
-    getBonus(getRandomInt(101), n);
+    getBonus(getRandomInt(111), n);
     return;
   }
   if (unitPlayer.weapon[1].caseBonus == numBonus) {
-    getBonus(getRandomInt(101), n);
+    getBonus(getRandomInt(111), n);
     return;
   }
   console.log(numBonus);
@@ -813,11 +826,21 @@ function getBonus(numBonus, n) {
         deleteBonus();
       };
       break;
-    case 6:
-      buttons[n].innerHTML = `Whip Teleport [2]`;
+    case 5:
+      buttons[n].innerHTML = `Flow Teleport [2]`;
       buttons[n].onclick = function () {
-        unitPlayer.weapon[1] = new whipShot();
-        unitPlayer.weapon[3] = new whipTele();
+        unitPlayer.weapon[1] = new flowShot();
+        unitPlayer.weapon[3] = new flowTele();
+        deleteBonus();
+      };
+      break;
+    case 6:
+      buttons[n].innerHTML = `Reduce 10% CD`;
+      buttons[n].onclick = function () {
+        reduceCD = reduceCD - 0.1;
+        for (let i = 0; i < unitPlayer.weapon.length; i++) {
+          unitPlayer.weapon[i].CD = unitPlayer.weapon[i].CD * reduceCD;
+        }
         deleteBonus();
       };
       break;
