@@ -108,7 +108,7 @@ class enemy {
     this.shiftY = this.H / 2;
     this.shiftX = this.W / 2;
     this.vel = new Vector2(0, 0);
-    this.HP = 2;
+    this.HP = 3;
     this.dmg = 1;
     this.getScore = 1;
   }
@@ -518,7 +518,6 @@ function moveBullets() {
   let temp = [];
   while (i < bulletArr.length) {
     if (bulletArr[i].checkRange()) {
-      console.log(bulletArr[i]);
       if (bulletArr[i].bulletType === 1 && unitPlayer.curSlot === 1) {
         unitPlayer.pos = bulletArr[i].pos;
       }
@@ -598,7 +597,7 @@ function drawBackground() {
 }
 
 let lastSpawnTimeT1 = 0;
-let intervalT1 = 1000;
+let intervalT1 = 1500;
 let maxReachedT1 = false;
 function spawnTimeEnemiesT1() {
   let curTime = new Date();
@@ -624,7 +623,7 @@ function spawnTimeEnemiesT2() {
   let curTime = new Date();
 
   if (curTime - lastSpawnTimeT2 >= intervalT2 && maxReachedT1) {
-    if (intervalT2 > 800 && !maxReachedT2) {
+    if (intervalT2 > 500 && !maxReachedT2) {
       intervalT2 -= Math.ceil(0.01 * intervalT2);
     } else {
       maxReachedT2 = true;
@@ -741,7 +740,7 @@ function checkBonus() {
     // bonusLock = false;
     getbonus.style.display = `flex`;
     pauseMode = true;
-    for (let i = 0; i < 2; i++) {
+    for (let i = 0; i < buttons.length; i++) {
       getBonus(getRandomInt(111), i);
     }
   }
@@ -758,13 +757,15 @@ function deleteBonus() {
 
 let bonusButton1 = document.querySelector(`#getBonusButton1`);
 let bonusButton2 = document.querySelector(`#getBonusButton2`);
-let buttons = [bonusButton1, bonusButton2];
+let bonusButton3 = document.querySelector(`#getBonusButton3`);
+let buttons = [bonusButton1, bonusButton2, bonusButton3];
 let getbonus = document.querySelector(`.getBonus`);
 
 function getRandomInt(max) {
   return Math.floor(Math.random() * max);
 }
 
+let stack = 0;
 function getBonus(numBonus, n) {
   if (numBonus < 30) {
     numBonus = 0;
@@ -789,7 +790,10 @@ function getBonus(numBonus, n) {
     getBonus(getRandomInt(111), n);
     return;
   }
-  console.log(numBonus);
+  if (reduceCD == 0.8 && numBonus == 6) {
+    getBonus(getRandomInt(111), n);
+    return;
+  }
   switch (numBonus) {
     case 0:
       buttons[n].innerHTML = `HP + 1`;
@@ -835,9 +839,11 @@ function getBonus(numBonus, n) {
       };
       break;
     case 6:
-      buttons[n].innerHTML = `Reduce 10% CD`;
+      stack = stack + 1;
+      buttons[n].innerHTML = `Reduce 10% CD (${stack}/2)`;
       buttons[n].onclick = function () {
         reduceCD = reduceCD - 0.1;
+        console.log(reduceCD);
         for (let i = 0; i < unitPlayer.weapon.length; i++) {
           unitPlayer.weapon[i].CD = unitPlayer.weapon[i].CD * reduceCD;
         }

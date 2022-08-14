@@ -256,7 +256,16 @@ canvas {
   border-radius: 8px;
   text-align: center;
 }
+
 #getBonusButton2 {
+  cursor: pointer;
+  margin: 25px 0 25px 0px;
+  border: 2px solid #000;
+  border-radius: 8px;
+  text-align: center;
+}
+
+#getBonusButton3 {
   cursor: pointer;
   margin: 25px 0 25px 0px;
   border: 2px solid #000;
@@ -272,6 +281,13 @@ canvas {
 }
 
 #getBonusButton2:hover {
+  transition: 0.2s;
+  transform: scale(1.1);
+  background: black;
+  color: #fff;
+}
+
+#getBonusButton3:hover {
   transition: 0.2s;
   transform: scale(1.1);
   background: black;
