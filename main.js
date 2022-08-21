@@ -988,6 +988,7 @@ function gameloop() {
 }
 
 let startGame = document.querySelector(`.buttonPlay`);
+
 startGame.onclick = function start() {
   document.querySelector(`.hello`).style.display = `none`;
   let bgVideo = document.querySelector(`.bgvideo`);
