@@ -1,6 +1,7 @@
 `use strict`;
 import { Vector2, RAD2DEG, DEG2RAD } from "./index.js";
 
+let progress = document.querySelector(`.progress`);
 const cv = document.getElementById("canvas");
 cv.width = 1200;
 cv.height = 800;
@@ -23,6 +24,7 @@ let orb4 = new Image();
 orb4.src = `assets/orb4.png`;
 let orb5 = new Image();
 orb5.src = `assets/orb5.png`;
+progress.value = 5;
 let bg = new Image();
 bg.src = `assets/bg.jpg`;
 let bulletArr = [];
@@ -30,8 +32,9 @@ let enemiesArr = [];
 let bulletType;
 let score = 0;
 let reduceCD = 1;
-////////////////////////////////////////////CLASS
 
+////////////////////////////////////////////CLASS
+progress.value = 10;
 class render {
   constructor() {
     this.camera.pos = new Vector2(
@@ -333,7 +336,7 @@ class flowTeleport extends defaultBullet {
     this.bulletType = 1;
   }
 }
-
+progress.value = 20;
 let unitPlayer = new Player(GG, 1900, 1200, 2, 100, 100);
 ////////////////////////////////////////////EVENT
 
@@ -716,7 +719,7 @@ function spawnEnemiesT2() {
   newEnemy2.vel.sub(newEnemy2.pos).normalize().mult(newEnemy2.speed);
   enemiesArr.push(newEnemy2);
 }
-
+progress.value = 50;
 //////////////////////////////////////////////BOSS
 
 //////////////////////////////////////////////BOSS
@@ -986,7 +989,7 @@ function gameloop() {
     window.requestAnimationFrame(pause);
   }
 }
-
+progress.value = 90;
 let startGame = document.querySelector(`.buttonPlay`);
 
 startGame.onclick = function start() {
@@ -995,3 +998,4 @@ startGame.onclick = function start() {
   bgVideo.remove();
   gameloop();
 };
+progress.value = 100;
