@@ -1004,3 +1004,4 @@ function startgame() {
 }
 progress.value = 80;
 bg.onload = startgame;
+//
