@@ -992,10 +992,16 @@ function gameloop() {
 progress.value = 90;
 let startGame = document.querySelector(`.buttonPlay`);
 
-startGame.onclick = function start() {
-  document.querySelector(`.hello`).style.display = `none`;
-  let bgVideo = document.querySelector(`.bgvideo`);
-  bgVideo.remove();
-  gameloop();
-};
-progress.value = 100;
+function startgame() {
+  progress.value = 100;
+  startGame.onclick = function start() {
+    document.querySelector(`.hello`).style.display = `none`;
+    let bgVideo = document.querySelector(`.bgvideo`);
+    bgVideo.remove();
+    gameloop();
+  };
+}
+
+bg.onload = startgame;
+
+progress.value = 90;
