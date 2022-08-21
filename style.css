@@ -1,5 +1,5 @@
 body {
-  background: #000;
+  background: gray;
 }
 
 .wrapper {
@@ -23,74 +23,73 @@ canvas {
   pointer-events: none;
 }
 
-#score {
-  display: inline-block;
+.stats {
   position: absolute;
+  display: flex;
+  flex-direction: column;
   top: 100px;
   left: 50px;
+  background: rgba(28, 28, 28, 0.2);
+  border: 1px dashed black;
+  color: #f0dc82;
+  padding: 10px 20px 10px 20px;
+}
+
+.ScoreWrapper {
+  display: flex;
   font-size: 26px;
+  padding: 0px 0px 50px 0px;
+}
+
+#score {
 }
 
 #scoreNum {
-  position: absolute;
-  left: 100px;
-  top: 2px;
+}
+
+.HPWrapper {
+  display: flex;
+  font-size: 26px;
+  color: #00ff7f;
 }
 
 #HP {
-  display: inline-block;
-  position: absolute;
-  top: 150px;
-  left: 50px;
-  font-size: 26px;
 }
 
 #HPnum {
-  position: absolute;
-  left: 105px;
-  top: 2px;
+}
+
+.ATKWrapper {
+  display: flex;
+  font-size: 26px;
 }
 
 #ATK {
-  display: inline-block;
-  position: absolute;
-  top: 175px;
-  left: 50px;
-  font-size: 26px;
 }
 
 #ATKnum {
-  position: absolute;
-  left: 105px;
-  top: 2px;
+}
+
+.ATKSPDWrapper {
+  display: flex;
+  font-size: 26px;
 }
 
 #ATKSPD {
-  display: inline-block;
-  position: absolute;
-  top: 200px;
-  left: 50px;
-  font-size: 26px;
 }
 
 #ATKSPDnum {
-  position: absolute;
-  left: 105px;
-  top: 2px;
+}
+
+.SPDWrapper {
+  font-size: 26px;
+  display: flex;
 }
 
 #SPD {
-  display: inline-block;
-  position: absolute;
-  top: 225px;
-  left: 50px;
-  font-size: 26px;
 }
 
 #SPDnum {
-  position: absolute;
-  left: 105px;
-  top: 2px;
 }
 
 .weapon {
@@ -101,8 +100,6 @@ canvas {
 #bullet1 {
   position: absolute;
   top: 700px;
-  border: 2px solid violet;
-  transform: scale(1.2);
   border-radius: 10px;
   height: 40px;
 }
@@ -198,13 +195,11 @@ canvas {
   width: 900px;
   height: 810px;
   z-index: 1;
-  /* background: #000; */
 }
 
 .buttonPlay {
   position: absolute;
   color: black;
-  /* color: white; */
   font-size: 50px;
   top: 400px;
   left: 480px;
@@ -231,9 +226,9 @@ canvas {
   position: absolute;
   top: 300px;
   left: 350px;
-  background: gray;
+  background-color: rgba(47, 53, 59, 0.5);
   border-radius: 10px;
-  color: black;
+  color: #f0dc82;
   display: none;
   flex-direction: column;
   justify-content: center;
@@ -293,4 +288,127 @@ canvas {
   background: black;
   color: #fff;
 }
-/*  */
+
+.interface-weapon-select {
+  border: 2px solid violet;
+  transform: scale(1.2);
+}
+
+.interface-weapon-nonselect {
+  border: 2px solid black;
+  transform: scale(1);
+}
+
+.highHP {
+  color: #00ff7f;
+}
+
+.lowHP {
+  color: #b00000;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.09);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.getHit {
+  display: none;
+  position: absolute;
+  top: 380px;
+  left: 590px;
+  color: #ff0033;
+}
+.getHitAnim1 {
+  animation: hit 0.4s;
+}
+
+@keyframes hit {
+  from {
+    font-size: 25px;
+  }
+  to {
+    font-size: 70px;
+    left: 570px;
+  }
+}
+
+.default {
+  color: #c7d0cc;
+}
+
+.good {
+  color: #7cfc00;
+}
+
+.middle {
+  color: #30d5c8;
+}
+
+.high {
+  color: #ed760e;
+}
+
+.rare {
+  color: #c41e3a;
+}
+
+.bgdefault {
+  background-color: rgba(184, 183, 153, 0.5);
+}
+
+.bggood {
+  background-color: #7cfc00;
+}
+
+.bgmiddle {
+  background-color: #30d5c8;
+}
+
+.bghigh {
+  background-color: #ed760e;
+}
+
+.bgrare {
+  background-color: #c41e3a;
+}
+
+.hide {
+  display: none;
+}
+
+.show {
+  display: block;
+}
+
+.filter_lowHP {
+  position: absolute;
+  top: 60px;
+  left: 350px;
+  width: 1200px;
+  height: 800px;
+  background-color: rgba(144, 0, 32, 0.3);
+  z-index: 10;
+  pointer-events: none;
+  animation: filter_lowHP 3s ease-in-out infinite;
+}
+
+@keyframes filter_lowHP {
+  0% {
+    background-color: rgba(144, 0, 32, 0.3);
+  }
+  50% {
+    background-color: rgba(144, 0, 32, 0.1);
+  }
+  100% {
+    background-color: rgba(144, 0, 32, 0.3);
+  }
+}

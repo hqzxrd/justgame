@@ -367,35 +367,50 @@ window.addEventListener(`keyup`, function (e) {
   }
 });
 
-let bullet1Icon = document.querySelector(`#bullet1`);
-let bullet2Icon = document.querySelector(`#bullet2`);
-let bullet3Icon = document.querySelector(`#bullet3`);
-let bullet4Icon = document.querySelector(`#specialBullet2`);
+let specialBulletIcon = document.querySelector(`#specialBullet2`);
+
+function showSpecialBullet() {
+  specialBulletIcon.style.display = `block`;
+}
+
+function hideSpecialBullet() {
+  specialBulletIcon.style.display = `none`;
+}
+
+let bulletButton = document.querySelectorAll(`.bullet`);
+
+function interfaceWeaponSelect(n = 0) {
+  bulletButton.forEach((item) => {
+    item.classList.remove(`interface-weapon-nonselect`);
+  });
+  bulletButton[n].classList.add(`interface-weapon-select`);
+}
+interfaceWeaponSelect();
+
+function interfaceWeaponNonSelect() {
+  bulletButton.forEach((item) => {
+    item.classList.remove(`interface-weapon-select`);
+  });
+}
+
 let curSlot = 0;
 window.addEventListener(`keydown`, function (e) {
   if (e.code == `Digit1`) {
-    bullet4Icon.style.display = `none`;
+    hideSpecialBullet();
     unitPlayer.curSlot = 0;
     curSlot = unitPlayer.curSlot;
-    bullet1Icon.style.border = `2px solid violet`;
-    bullet1Icon.style.transform = `scale(1.2)`;
-    bullet2Icon.style.border = `2px solid black`;
-    bullet2Icon.style.transform = `scale(1.0)`;
-    bullet4Icon.style.border = `2px solid black`;
-    bullet4Icon.style.transform = `scale(1.0)`;
+    interfaceWeaponNonSelect();
+    interfaceWeaponSelect(unitPlayer.curSlot);
   }
   if (e.code == `Digit2`) {
     if (unitPlayer.weapon[1].type === 5) {
-      bullet4Icon.style.display = `block`;
+      showSpecialBullet();
     }
     unitPlayer.curSlot = 1;
     curSlot = unitPlayer.curSlot;
-    bullet4Icon.style.border = `2px solid black`;
-    bullet4Icon.style.transform = `scale(1.0)`;
-    bullet2Icon.style.border = `2px solid violet`;
-    bullet2Icon.style.transform = `scale(1.2)`;
-    bullet1Icon.style.border = `2px solid black`;
-    bullet1Icon.style.transform = `scale(1)`;
+
+    interfaceWeaponNonSelect();
+    interfaceWeaponSelect(unitPlayer.curSlot);
   }
   if (e.code == `Space`) {
     if (unitPlayer.weapon[2].curCD > 0) {
@@ -405,10 +420,11 @@ window.addEventListener(`keydown`, function (e) {
       unitPlayer.shooting = true;
       unitPlayer.curSlot = 2;
     }
-    bullet3Icon.style.border = `2px solid violet`;
-    bullet3Icon.style.transform = `scale(1.2)`;
+    interfaceWeaponNonSelect();
+    interfaceWeaponSelect(3);
   }
   if (e.code == `ShiftLeft`) {
+    unitPlayer.curSlot = 1;
     if (curSlot === 1) {
       if (unitPlayer.weapon[3].curCD > 0) {
         unitPlayer.curSlot = curSlot;
@@ -418,8 +434,8 @@ window.addEventListener(`keydown`, function (e) {
         unitPlayer.shooting = true;
         unitPlayer.curSlot = 3;
       }
-      bullet4Icon.style.border = `2px solid violet`;
-      bullet4Icon.style.transform = `scale(1.2)`;
+      interfaceWeaponNonSelect();
+      interfaceWeaponSelect(2);
     } else {
     }
   }
@@ -433,8 +449,7 @@ window.addEventListener(`keyup`, function (e) {
       unitPlayer.curSlot = 2;
       unitPlayer.shooting = false;
     }
-    bullet3Icon.style.border = `2px solid black`;
-    bullet3Icon.style.transform = `scale(1)`;
+    interfaceWeaponNonSelect();
   }
   if (e.code == `ShiftLeft`) {
     if (curSlot === 1) {
@@ -445,8 +460,7 @@ window.addEventListener(`keyup`, function (e) {
         unitPlayer.curSlot = 1;
         unitPlayer.shooting = false;
       }
-      bullet4Icon.style.border = `2px solid black`;
-      bullet4Icon.style.transform = `scale(1)`;
+      interfaceWeaponNonSelect();
     }
   }
 });
@@ -639,9 +653,9 @@ function local2Global(vec) {
   return temp;
 }
 
-let lastSpawnTimeT1 = 0;
-let intervalT1 = 1000;
-let maxReachedT1 = false;
+let lastSpawnTimeT1 = 0,
+  intervalT1 = 1000,
+  maxReachedT1 = false;
 function spawnTimeEnemiesT1() {
   let curTime = new Date();
 
@@ -659,9 +673,9 @@ function spawnTimeEnemiesT1() {
   }
 }
 
-let lastSpawnTimeT2 = 0;
-let intervalT2 = 1500;
-let maxReachedT2 = false;
+let lastSpawnTimeT2 = 0,
+  intervalT2 = 1500,
+  maxReachedT2 = false;
 function spawnTimeEnemiesT2() {
   let curTime = new Date();
 
@@ -758,6 +772,7 @@ function checkHitTime(i) {
   if (curTime - lastHitTime >= interval) {
     lastHitTime = curTime;
     unitPlayer.HP -= enemiesArr[i].dmg;
+    getHitAnim(`-${enemiesArr[i].dmg}`);
   }
 }
 
@@ -773,14 +788,14 @@ function checkHitPlayer() {
 }
 
 let scoreBoneses = [
-  10, 25, 50, 75, 10, 150, 175, 200, 240, 300, 350, 400, 450, 500, 600, 700,
-  800, 900, 1000, 1100, 1200, 1300, 1400, 1500,
+  0, 2, 3, 75, 10, 150, 175, 200, 240, 300, 350, 400, 450, 500, 600, 700, 800,
+  900, 1000, 1100, 1200, 1300, 1400, 1500,
 ];
 
 let bonusLock = true;
 function checkBonus() {
   if (score >= scoreBoneses[0]) {
-    // bonusLock = false;
+    bonusLock = false;
     getbonus.style.display = `flex`;
     pauseMode = true;
     for (let i = 0; i < buttons.length; i++) {
@@ -798,11 +813,11 @@ function deleteBonus() {
   }
 }
 
-let bonusButton1 = document.querySelector(`#getBonusButton1`);
-let bonusButton2 = document.querySelector(`#getBonusButton2`);
-let bonusButton3 = document.querySelector(`#getBonusButton3`);
-let buttons = [bonusButton1, bonusButton2, bonusButton3];
-let getbonus = document.querySelector(`.getBonus`);
+let bonusButton1 = document.querySelector(`#getBonusButton1`),
+  bonusButton2 = document.querySelector(`#getBonusButton2`),
+  bonusButton3 = document.querySelector(`#getBonusButton3`),
+  buttons = [bonusButton1, bonusButton2, bonusButton3],
+  getbonus = document.querySelector(`.getBonus`);
 
 function getRandomInt(max) {
   return Math.floor(Math.random() * max);
@@ -896,6 +911,7 @@ function getBonus(numBonus, n) {
   }
 }
 
+console.log(bonusButton3.classList[1]);
 let pauseMode = false;
 window.addEventListener(`keydown`, function (e) {
   if (e.code == `Escape` && bonusLock === true) {
@@ -917,7 +933,35 @@ function stats() {
   document.querySelector(`#ATKSPDnum`).innerHTML = unitPlayer.ATKSPD;
   document.querySelector(`#SPDnum`).innerHTML = unitPlayer.speed;
 }
+let getHit = document.querySelector(`.getHit`);
+function getHitAnim(dmg) {
+  getHit.textContent = `${dmg}`;
+  getHit.classList.add(`show`);
+  getHit.classList.add(`getHitAnim1`);
+  function removeHitAnim() {
+    getHit.classList.remove(`show`);
+    getHit.classList.remove(`getHitAnim1`);
+  }
+  setTimeout(removeHitAnim, 200);
+}
 
+let HP = document.querySelector(`.HPWrapper`),
+  filterLowHP = document.querySelector(`.filter_lowHP`);
+filterLowHP.classList.add(`hide`);
+function checkStats() {
+  if (unitPlayer.HP >= 2) {
+    HP.classList.remove(`lowHP`);
+    HP.classList.add(`highHP`);
+    filterLowHP.classList.remove(`show`);
+    filterLowHP.classList.add(`hide`);
+  }
+  if (unitPlayer.HP < 2) {
+    HP.classList.remove(`highHP`);
+    HP.classList.add(`lowHP`);
+    filterLowHP.classList.remove(`hide`);
+    filterLowHP.classList.add(`show`);
+  }
+}
 function gameloop() {
   if (unitPlayer.HP <= 0) {
     alert(`Потрачено`);
@@ -926,6 +970,7 @@ function gameloop() {
     window.requestAnimationFrame(gameloop);
     checkBonus();
     stats();
+    checkStats();
     drawBackground();
     playerMove();
     unitPlayer.drawPlayer();

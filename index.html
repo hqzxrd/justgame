@@ -11,47 +11,53 @@
     <div class="wrapper">
       <video class="bgvideo" src="./assets/bg.mp4" muted autoplay loop></video>
       <div class="hello"><div class="buttonPlay">PLAY</div></div>
+      <div class="filter_lowHP"></div>
       <div class="interface">
-        <div id="score">
-          Score:
-          <div id="scoreNum">0</div>
-        </div>
-        <div id="HP">
-          HP:
-          <div id="HPnum">0</div>
-        </div>
-        <div id="ATK">
-          ATK:
-          <div id="ATKnum">0</div>
-        </div>
-        <div id="ATKSPD">
-          ATKSPD:
-          <div id="ATKSPDnum">0</div>
-        </div>
-        <div id="SPD">
-          SPD:
-          <div id="SPDnum">0</div>
+        <div class="getHit .hide"></div>
+        <div class="stats">
+          <div class="ScoreWrapper">
+            <div id="score">Score:</div>
+            <div id="scoreNum">0</div>
+          </div>
+
+          <div class="HPWrapper">
+            <div id="HP">HP:</div>
+            <div id="HPnum">0</div>
+          </div>
+
+          <div class="ATKWrapper">
+            <div id="ATK">ATK:</div>
+            <div id="ATKnum">0</div>
+          </div>
+          <div class="ATKSPDWrapper">
+            <div id="ATKSPD">ATKSPD:</div>
+            <div id="ATKSPDnum">0</div>
+          </div>
+          <div class="SPDWrapper">
+            <div id="SPD">SPD:</div>
+            <div id="SPDnum">0</div>
+          </div>
         </div>
         <div class="weapon">
-          <div id="bullet1">
+          <div id="bullet1" class="bullet">
             <div class="nameOfButton">1</div>
             <img src="./assets/bullet1.png" alt="" />
             <div class="cd1"></div>
           </div>
 
-          <div id="bullet2">
+          <div id="bullet2" class="bullet">
             <div class="nameOfButton">2</div>
             <img src="./assets/bullet2.png" alt="" />
             <div class="cd2"></div>
           </div>
 
-          <div id="specialBullet2">
+          <div id="specialBullet2" class="bullet">
             <div class="nameOfButton">Shift</div>
             <img src="./assets/bullet2.png" alt="" />
             <div class="cd4"></div>
           </div>
 
-          <div id="bullet3">
+          <div id="bullet3" class="bullet">
             <div class="nameOfButton">Space</div>
             <img src="./assets/bullet2.png" alt="" />
             <div class="cd3"></div>
@@ -60,9 +66,9 @@
         <div class="getBonus">
           Бонус на выбор:
           <div class="wrapperBonus">
-            <div id="getBonusButton1">Random Bonus 1</div>
-            <div id="getBonusButton2">Random Bonus 2</div>
-            <div id="getBonusButton3">Random Bonus 3</div>
+            <div id="getBonusButton1" class="bgdefault">Random Bonus 1</div>
+            <div id="getBonusButton2" class="bgdefault">Random Bonus 2</div>
+            <div id="getBonusButton3" class="bgdefault">Random Bonus 3</div>
           </div>
         </div>
       </div>
