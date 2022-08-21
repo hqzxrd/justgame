@@ -8,6 +8,10 @@ cv.height = 800;
 const ct = cv.getContext("2d");
 let GG = new Image();
 GG.src = `assets/GG1.png`;
+let GGRight1 = new Image();
+GGRight1.src = `assets/GGRight1.png`;
+let GGRight2 = new Image();
+GGRight2.src = `assets/GGRight2.png`;
 let tier1enemy = new Image();
 tier1enemy.src = `assets/tier1enemy.png`;
 let tier2enemy = new Image();
@@ -24,7 +28,6 @@ let orb4 = new Image();
 orb4.src = `assets/orb4.png`;
 let orb5 = new Image();
 orb5.src = `assets/orb5.png`;
-progress.value = 5;
 let bg = new Image();
 bg.src = `assets/bg.jpg`;
 let bulletArr = [];
@@ -32,9 +35,8 @@ let enemiesArr = [];
 let bulletType;
 let score = 0;
 let reduceCD = 1;
-
+progress.value = 60;
 ////////////////////////////////////////////CLASS
-progress.value = 10;
 class render {
   constructor() {
     this.camera.pos = new Vector2(
@@ -86,6 +88,7 @@ class Player {
       this.H
     );
   }
+
   shot() {
     let curTime = new Date();
     if (
@@ -336,7 +339,6 @@ class flowTeleport extends defaultBullet {
     this.bulletType = 1;
   }
 }
-progress.value = 20;
 let unitPlayer = new Player(GG, 1900, 1200, 2, 100, 100);
 ////////////////////////////////////////////EVENT
 
@@ -389,7 +391,6 @@ function interfaceWeaponSelect(n = 0) {
   bulletButton[n].classList.add(`interface-weapon-select`);
 }
 interfaceWeaponSelect();
-
 function interfaceWeaponNonSelect() {
   bulletButton.forEach((item) => {
     item.classList.remove(`interface-weapon-select`);
@@ -719,7 +720,6 @@ function spawnEnemiesT2() {
   newEnemy2.vel.sub(newEnemy2.pos).normalize().mult(newEnemy2.speed);
   enemiesArr.push(newEnemy2);
 }
-progress.value = 50;
 //////////////////////////////////////////////BOSS
 
 //////////////////////////////////////////////BOSS
@@ -791,8 +791,8 @@ function checkHitPlayer() {
 }
 
 let scoreBoneses = [
-  10, 25, 50, 75, 100, 150, 175, 200, 240, 300, 350, 400, 450, 500, 600, 700,
-  800, 900, 1000, 1100, 1200, 1300, 1400, 1500,
+  0, 1, 2, 3, 100, 150, 175, 200, 240, 300, 350, 400, 450, 500, 600, 700, 800,
+  900, 1000, 1100, 1200, 1300, 1400, 1500,
 ];
 
 let bonusLock = true;
@@ -826,7 +826,7 @@ function getRandomInt(max) {
   return Math.floor(Math.random() * max);
 }
 
-let stack = 0;
+let stack = 1;
 function getBonus(numBonus, n) {
   if (numBonus < 30) {
     numBonus = 0;
@@ -900,9 +900,9 @@ function getBonus(numBonus, n) {
       };
       break;
     case 6:
-      stack = stack + 1;
       buttons[n].innerHTML = `Reduce 10% CD (${stack}/2)`;
       buttons[n].onclick = function () {
+        stack = stack + 1;
         reduceCD = reduceCD - 0.1;
         console.log(reduceCD);
         for (let i = 0; i < unitPlayer.weapon.length; i++) {
@@ -914,7 +914,6 @@ function getBonus(numBonus, n) {
   }
 }
 
-console.log(bonusButton3.classList[1]);
 let pauseMode = false;
 window.addEventListener(`keydown`, function (e) {
   if (e.code == `Escape` && bonusLock === true) {
@@ -975,6 +974,7 @@ function gameloop() {
     stats();
     checkStats();
     drawBackground();
+
     playerMove();
     unitPlayer.drawPlayer();
     unitPlayer.shot();
@@ -989,19 +989,18 @@ function gameloop() {
     window.requestAnimationFrame(pause);
   }
 }
-progress.value = 90;
 let startGame = document.querySelector(`.buttonPlay`);
 
 function startgame() {
-  progress.value = 100;
   startGame.onclick = function start() {
     document.querySelector(`.hello`).style.display = `none`;
     let bgVideo = document.querySelector(`.bgvideo`);
     bgVideo.remove();
+    progress.classList.remove(`show`);
+    progress.classList.add(`hide`);
     gameloop();
   };
+  progress.value = 100;
 }
-
+progress.value = 80;
 bg.onload = startgame;
-
-progress.value = 90;
